@@ -1,0 +1,47 @@
+{
+  "os":  "Linux-6.8.0-106-generic-x86_64-with-glibc2.35",
+  "python":  "CPython 3.13.12",
+  "startedAt":  "2026-03-16T15:29:26.083747Z",
+  "args":  [
+    "Mjlab-Velocity-Flat-Digit-V3-Load",
+    "--env.scene.num-envs",
+    "2048",
+    "--agent.max-iterations",
+    "12000"
+  ],
+  "program":  "/home/vancenguyen/research/mjlab/.venv/bin/train",
+  "codePath":  ".venv/bin/train",
+  "codePathLocal":  ".venv/bin/train",
+  "git":  {
+    "remote":  "https://github.com/nguyenvchuong/mjlab.git",
+    "commit":  "d1c20b60d9bd09e0c9a09577a82ebadc0ef009cc"
+  },
+  "email":  "vanchuong.ac@gmail.com",
+  "root":  "/home/vancenguyen/research/mjlab",
+  "host":  "LT-VNguyen-Alien",
+  "executable":  "/home/vancenguyen/research/mjlab/.venv/bin/python",
+  "cpu_count":  16,
+  "cpu_count_logical":  22,
+  "gpu":  "NVIDIA GeForce RTX 4090 Laptop GPU",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "2014574526464",
+      "used":  "783482454016"
+    }
+  },
+  "memory":  {
+    "total":  "33139617792"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 4090 Laptop GPU",
+      "memoryTotal":  "17171480576",
+      "cudaCores":  9728,
+      "architecture":  "Ada",
+      "uuid":  "GPU-61dff70f-10fe-82e4-4b01-a45c9cb9d47f"
+    }
+  ],
+  "cudaVersion":  "12.4",
+  "writerId":  "6eqz0vanc34g3xi3cwmf11kovr0ryapn"
+}

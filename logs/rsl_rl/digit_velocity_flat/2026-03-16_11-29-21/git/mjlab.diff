@@ -1,0 +1,42 @@
+--- git status ---
+On branch main
+Your branch is ahead of 'upstream/main' by 9 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/mjlab/asset_zoo/robots/digit_v3/digit_with_load.py
+	modified:   src/mjlab/tasks/velocity/config/digit_v3/env_cfgs.py
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/src/mjlab/asset_zoo/robots/digit_v3/digit_with_load.py b/src/mjlab/asset_zoo/robots/digit_v3/digit_with_load.py
+index 59604e6..cc4d601 100644
+--- a/src/mjlab/asset_zoo/robots/digit_v3/digit_with_load.py
++++ b/src/mjlab/asset_zoo/robots/digit_v3/digit_with_load.py
+@@ -7,7 +7,7 @@ from mjlab.asset_zoo.robots.digit_v3.digit_constants import get_spec_upright
+ 
+ _BAR_RADIUS = 0.25  # metres
+ _BAR_LENGTH = 0.3  # metres — change this to resize
+-_BAR_MASS = 2
++_BAR_MASS = 10
+ _BAR_RGBA = np.array([0.8, 0.2, 0.2, 1.0], dtype=np.float32)
+ 
+ # Direction computed from original endpoints; length controlled by _BAR_LENGTH.
+diff --git a/src/mjlab/tasks/velocity/config/digit_v3/env_cfgs.py b/src/mjlab/tasks/velocity/config/digit_v3/env_cfgs.py
+index 5b309a1..655eef6 100644
+--- a/src/mjlab/tasks/velocity/config/digit_v3/env_cfgs.py
++++ b/src/mjlab/tasks/velocity/config/digit_v3/env_cfgs.py
+@@ -337,8 +337,7 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+   cfg.curriculum["command_vel"].params["velocity_stages"] = [
+     {"step": 0, "lin_vel_x": (0.0, 0.0)},
+     {"step": 2000 * 24, "lin_vel_x": (0.0, 1.0)},
+-    {"step": 6000 * 24, "lin_vel_x": (-1.0, 1.0)},
+-    {"step": 15000 * 24, "lin_vel_x": (-1.0, 1.0), "ang_vel_z": (-0.3, 0.3)},
++    {"step": 6000 * 24, "lin_vel_x": (0.0, 1.0), "ang_vel_z": (-0.3, 0.3)},
+   ]
+ 
+   # 15. Disable initial joint-position randomisation — Digit V3 has closed
