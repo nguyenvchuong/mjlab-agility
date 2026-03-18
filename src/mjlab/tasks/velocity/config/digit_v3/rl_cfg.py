@@ -50,8 +50,7 @@ def digit_v3_flat_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
 
   Uses a smaller network than the rough terrain variant: flat terrain has a
   lower-dimensional observation (no height scan), so a smaller network trains
-  faster and generalises better.  Architecture mirrors the IsaacLab V4 flat
-  config ([128, 128, 128] vs [512, 256, 128] for rough).
+  faster and generalises better.
   """
   return RslRlOnPolicyRunnerCfg(
     actor=RslRlModelCfg(

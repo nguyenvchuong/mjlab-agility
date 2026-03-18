@@ -167,10 +167,6 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     params={"sensor_name": self_collision_cfg.name, "force_threshold": 10.0},
   )
 
-  # -----------------------------------------------------------------------
-  # Improvements from IsaacLab Digit V4 training pipeline
-  # -----------------------------------------------------------------------
-
   # 1. Termination penalty: strongly penalise non-timeout episode endings
   #    (e.g. falling over). This stabilises early training significantly.
   cfg.rewards["termination_penalty"] = RewardTermCfg(
@@ -183,7 +179,7 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   #    Weight kept low (0.25) to avoid single-foot pivot exploitation.
   cfg.rewards["air_time"].weight = 0.25
 
-  # 3. Reduce action-rate penalty to match V4 tuning (-0.1 → -0.008).
+  # 3. Reduce action-rate penalty
   #    The base value is far too aggressive and suppresses leg swing.
   cfg.rewards["action_rate_l2"].weight = -0.008
 
@@ -218,7 +214,7 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   )
 
   # 6. Undesired contacts: penalise rod/tarsus/shin bodies touching the
-  #    terrain (mimics V4's undesired_contacts term, weight -0.1).
+  #    terrain
   rod_tarsus_contact_cfg = ContactSensorCfg(
     name="rod_tarsus_contact",
     primary=ContactMatch(
@@ -241,11 +237,8 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     },
   )
 
-  # 7. Keep fall termination at default 70°.  The V4 value of 40° is too
-  #    strict for early training — short episodes give no useful gradient
-  #    signal.  Tighten only after the policy can reliably stand and walk.
 
-  # 8. Strong flat-orientation penalty (V4: weight=-2.5).
+  # 8. Strong flat-orientation penalty 
   #    Much stronger than the positive `upright` reward already present;
   #    directly penalises projected-gravity xy deviation.
   cfg.rewards["flat_orientation_l2"] = RewardTermCfg(
@@ -254,17 +247,17 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     params={"asset_cfg": SceneEntityCfg("robot", body_names=("torso",))},
   )
 
-  # 9. Vertical velocity penalty (V4: weight=-2.0).
+  # 9. Vertical velocity penalty 
   #    Prevents the robot from bouncing or hopping.
   cfg.rewards["lin_vel_z_l2"] = RewardTermCfg(
     func=mdp.lin_vel_z_l2,
     weight=-2.0,
   )
 
-  # 10. Angular velocity penalty: increase weight to match V4 (-0.1).
+  # 10. Angular velocity penalty:
   cfg.rewards["body_ang_vel"].weight = -0.1
 
-  # 11. Joint deviation penalties keep specific joints near zero (V4 values).
+  # 11. Joint deviation penalties keep specific joints near zero
   cfg.rewards["joint_deviation_hip_roll"] = RewardTermCfg(
     func=mdp.joint_deviation_l1,
     weight=-0.1,
@@ -315,8 +308,7 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   # 13. Simplify the command space so the robot must learn to walk forward
   #     before being asked to turn.  Lateral velocity and heading control are
   #     disabled entirely; angular velocity is reintroduced by the curriculum
-  #     at step 6000*24.  Without this, the robot exploits spinning on one
-  #     foot to satisfy angular commands without ever walking.
+  #     at step 6000*24.
   twist_cmd = cfg.commands["twist"]
   assert isinstance(twist_cmd, UniformVelocityCommandCfg)
   twist_cmd.ranges.lin_vel_y = (0.0, 0.0)
@@ -337,24 +329,29 @@ def digit_v3_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg.curriculum["command_vel"].params["velocity_stages"] = [
     {"step": 0, "lin_vel_x": (0.0, 0.0)},
     {"step": 2000 * 24, "lin_vel_x": (0.0, 1.0)},
-    {"step": 6000 * 24, "lin_vel_x": (0.0, 1.0), "ang_vel_z": (-0.3, 0.3)},
+    {"step": 6000 * 24, "lin_vel_x": (0.0, 1.0), "ang_vel_z": (-0.5, 0.5)},
   ]
 
-  # 15. Disable initial joint-position randomisation — Digit V3 has closed
-  #     kinematic loops; randomising joints violates the loop constraints.
+  # 15. Disable initial joint-position randomisation
   if "reset_joints" in cfg.events:
     cfg.events["reset_joints"].params["position_range"] = (1.0, 1.0)
 
-  # 15. Disable push_robot (matches V4). Pushing before the robot can stand
-  #     only destabilises early training.
-  cfg.events.pop("push_robot", None)
+  # 15. Override push_robot with reduced rotational perturbations.
+  cfg.events["push_robot"].interval_range_s = (2.0, 5.0)
+  cfg.events["push_robot"].params["velocity_range"] = {
+    "x": (-0.5, 0.5),
+    "y": (-0.5, 0.5),
+    "z": (-0.4, 0.4),
+    "roll": (-0.4, 0.4),
+    "pitch": (-0.4, 0.4),
+    "yaw": (-0.2, 0.2),
+  }
 
   # Apply play mode overrides.
   if play:
     cfg.episode_length_s = int(1e9)
 
     cfg.observations["actor"].enable_corruption = False
-    cfg.events.pop("push_robot", None)
     cfg.curriculum = {}
     cfg.events["randomize_terrain"] = EventTermCfg(
       func=envs_mdp.randomize_terrain,
@@ -407,6 +404,6 @@ def digit_v3_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     twist_cmd = cfg.commands["twist"]
     assert isinstance(twist_cmd, UniformVelocityCommandCfg)
     twist_cmd.ranges.lin_vel_x = (0, 1.0)
-    twist_cmd.ranges.ang_vel_z = (-0.3, 0.3)
+    twist_cmd.ranges.ang_vel_z = (-0.5, 0.5)
 
   return cfg
