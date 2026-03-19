@@ -187,6 +187,8 @@ def run_train(task_id: str, cfg: TrainConfig, log_dir: Path) -> None:
       ).splitlines()
       for rel in modified:
         src = repo_root / rel
+        if not src.is_file():
+          continue
         dst = log_dir / "snapshot" / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
